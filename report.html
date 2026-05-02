@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국내호텔팀 주간 성과 분석</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 3px solid #00C853;
+            padding-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #00C853;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            color: #00C853;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-left: 15px;
+            border-left: 4px solid #00C853;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grid.three {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            color: #333;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .card-content {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .highlight-number {
+            color: #00C853;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .highlight-text {
+            color: #00C853;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table thead {
+            background: #00C853;
+            color: white;
+        }
+
+        table th {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        table tbody tr:hover {
+            background: #f0f8f5;
+        }
+
+        table td:first-child {
+            font-weight: 600;
+            color: #00C853;
+        }
+
+        .insight-box {
+            background: #e8f5e9;
+            border-left: 4px solid #00C853;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .insight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insight-box li {
+            color: #333;
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .insight-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #00C853;
+            font-weight: 700;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .stat-box .label {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box .value {
+            color: #00C853;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .stat-box .unit {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid, .two-column {
+                grid-template-columns: 1fr;
+            }
+            .grid.three {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 국내호텔팀 주간 성과 분석</h1>
+            <p>4월 13일 ~ 5월 3일 종합 성과 보고</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🎯 핵심 성과 지표</h2>
+            <div class="grid three">
+                <div class="stat-box">
+                    <div class="label">4월 예약 진척률</div>
+                    <div class="value">92%</div>
+                    <div class="unit">22억원 / 목표 24억원</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">5월 예약 진척률</div>
+                    <div class="value">49%</div>
+                    <div class="unit">19억원 / 목표 38.5억원</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">5월 객실사입</div>
+                    <div class="value">122%</div>
+                    <div class="unit">6.7억원 / 목표 5.5억원</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📈 월별 예약 현황</h2>
+            <div class="two-column">
+                <div class="chart-container">
+                    <canvas id="aprilChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mayChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📊 주간별 성과 분석</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>예약수</th>
+                            <th>결제액</th>
+                            <th>할인금액</th>
+                            <th>ADR</th>
+                            <th>실이익률</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>4/13~4/19</td>
+                            <td>3,130건</td>
+                            <td>7.78억원</td>
+                            <td>1,641만원</td>
+                            <td>248,559원</td>
+                            <td>2.84%</td>
+                        </tr>
+                        <tr>
+                            <td>4/20~4/26</td>
+                            <td>3,091건</td>
+                            <td>8.26억원</td>
+                            <td>1,804만원</td>
+                            <td>267,129원</td>
+                            <td>3.06%</td>
+                        </tr>
+                        <tr>
+                            <td>WoW 증감</td>
+                            <td>-39건 (-1.2%)</td>
+                            <td><span class="highlight-text">+4,771만원 (+6.1%)</span></td>
+                            <td>+163만원 (+10%)</td>
+                            <td>+18,570원 (+7.5%)</td>
+                            <td>+0.22%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="insight-box">
+                <ul>
+                    <li>전주 대비 결제액 6.1% 성장</li>
+                    <li>ADR 7.5% 증가로 객단가 상승</li>
+                    <li>실이익률 개선 (2.84% → 3.06%)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🏨 객실 사입 현황</h2>
+            <div class="two-column">
+                <div class="card">
+                    <h3>📅 4월 객실 사입</h3>
+                    <div class="card-content">
+                        <div class="highlight-number">95백만원</div>
+                        <p><strong>목표:</strong> 4.5억원 | <strong>달성률:</strong> <span class="highlight-text">21%</span></p>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        <p style="margin-top: 15px;"><strong>계약 현황</strong></p>
+                        <ul style="margin-top: 10px; padding-left: 15px; color: #666; font-size: 13px;">
+                            <li>✓ 계약 완료: 6개 호텔</li>
+                            <li>✓ 계약 진행 중: 1개 호텔</li>
+                            <li>✓ 월개런티: 6개</li>
+                            <li>✓ 주말 고정: 1개</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📅 5월 객실 사입</h3>
+                    <div class="card-content">
+                        <div class="highlight-number">6.7억원</div>
+                        <p><strong>목표:</strong> 5.5억원 | <strong>달성률:</strong> <span class="highlight-text">122%</span></p>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        <p style="margin-top: 15px;"><strong>확보 현황</strong></p>
+                        <ul style="margin-top: 10px; padding-left: 15px; color: #666; font-size: 13px;">
+                            <li>✓ 총 18개 시설 확보</li>
+                            <li>✓ 월개런티: 7개 (561실)</li>
+                            <li>✓ 기간제: 11개 (3,738실)</li>
+                            <li>✓ 총 4,299실 확보</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🎯 네이버 여행핫딜 & 라이브</h2>
+            <div class="grid">
+                <div class="chart-container">
+                    <canvas id="promotionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="hotdealChart"></canvas>
+                </div>
+            </div>
+            <div class="insight-box">
+                <ul>
+                    <li><strong>단독딜 & 라이브:</strong> 총 123건 판매, 47.93백만원</li>
+                    <li><strong>여행핫딜:</strong> 5개 지역 71건 판매, 30.95백만원</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📊 전년동기 비교 (YoY)</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>2026년 4월</th>
+                            <th>2025년 4월</th>
+                            <th>YoY 성장률</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>거래액</td>
+                            <td>22억원</td>
+                            <td>15억원</td>
+                            <td><span class="highlight-text">+47%</span></td>
+                        </tr>
+                        <tr>
+                            <td>할인율</td>
+                            <td>2.3%</td>
+                            <td>1.3%</td>
+                            <td>+77%</td>
+                        </tr>
+                        <tr>
+                            <td>실이익률</td>
+                            <td>2.78%</td>
+                            <td>5.59%</td>
+                            <td>-50%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>국내호텔팀 성과 보고서 | 2026년 4월 29일 작성</p>
+        </div>
+    </div>
+
+    <script>
+        const aprilCtx = document.getElementById('aprilChart').getContext('2d');
+        new Chart(aprilCtx, {
+            type: 'bar',
+            data: {
+                labels: ['목표', '결제액'],
+                datasets: [{
+                    label: '억원',
+                    data: [24, 22],
+                    backgroundColor: ['#E0E0E0', '#00C853'],
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: '4월 예약 현황 (92% 달성)',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#333'
+                    }
+                },
+                scales: {
+                    x: {
+                        max: 28,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '억원';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const mayCtx = document.getElementById('mayChart').getContext('2d');
+        new Chart(mayCtx, {
+            type: 'bar',
+            data: {
+                labels: ['목표', '결제액'],
+                datasets: [{
+                    label: '억원',
+                    data: [38.5, 19],
+                    backgroundColor: ['#E0E0E0', '#00C853'],
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: '5월 예약 현황 (49% 진척)',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#333'
+                    }
+                },
+                scales: {
+                    x: {
+                        max: 42,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '억원';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const promoCtx = document.getElementById('promotionChart').getContext('2d');
+        new Chart(promoCtx, {
+            type: 'bar',
+            data: {
+                labels: ['롯데 호텔', '파르나스 제주'],
+                datasets: [{
+                    label: '판매액 (백만원)',
+                    data: [2.62, 3.21],
+                    backgroundColor: ['#FF6B6B', '#00C853'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: '단독딜 & 라이브 성과',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#333'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 4
+                    }
+                }
+            }
+        });
+
+        const hotdealCtx = document.getElementById('hotdealChart').getContext('2d');
+        new Chart(hotdealCtx, {
+            type: 'bar',
+            data: {
+                labels: ['서울', '부산', '강원', '속초'],
+                datasets: [{
+                    label: '판매액 (억원)',
+                    data: [0.87, 1.44, 0.27, 0.51],
+                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: '여행핫딜 지역별 성과',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#333'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1.8
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
